@@ -21,6 +21,28 @@ a {
   }
   body {
     color: white;
-    background: black;
+    background: #595959;
   }
+}
+
+@font-face {
+  font-family: "Oleo Script Regular";
+  src: url(../public/fonts/OleoScript-Regular.ttf);
+  font-style: normal
+}
+
+@font-face {
+  font-family: "Avenir Roman";
+  src: url(../public/fonts/AvenirLTStd-Roman.otf);
+  font-style: normal
+}
+
+.title {
+  font-family: "Oleo Script Regular";
+}
+
+.text {
+  font-family: "Avenir Roman";
+  font-size: 24px;
+  color: black;
 }
