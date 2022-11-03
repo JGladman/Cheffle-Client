@@ -4,7 +4,7 @@ import styled from 'styled-components'
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 5rem 5rem 5rem 5rem;
+  margin: 3rem 5rem 3rem 5rem;
   width: auto;
   height: 500px;
 `
@@ -20,14 +20,14 @@ const Tab = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 200px;
-  height: 75px;
-  background-color: ${props => props.selected ? "#F4B111" : "#E8E896"};
+  width: 160px;
+  height: 50px;
+  background-color: ${props => props.selected ? "#F7C244" : "#FFEBBD"};
   border-radius: 15px 15px 0px 0px;
   box-shadow: ${props => props.selected ? null : "4px 0px 4px rgba(0,0,0,0.45)"};
   &:hover {
     box-shadow: 0px 0px 0px black;
-    background-color: #F4B111; 
+    background-color: #F7C244; 
   }
 `
 
@@ -35,7 +35,7 @@ const Holder = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  background-color: #FFFF97;
+  background-color: #F7C244;
   width: 100%;
   height: 100%;
   box-shadow: 4px 4px 4px rgba(0,0,0,0.45);
@@ -48,10 +48,11 @@ const SwitcherHolder = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     background-color: #FFEBBD;
     border-radius: 10px;
     width:34rem;
-    height: 5rem;
+    height: 4rem;
     padding-left: 2rem;
 `
 

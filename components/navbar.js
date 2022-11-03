@@ -8,12 +8,12 @@ const Wrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 8.75rem;
-  background-color: #37ebca;
+  height: 6rem;
+  background-color: #F7C244;
 `
 
 const Title = styled.p`
-  font-size: 96px;
+  font-size: 60px;
   color: #FFDE92;
   margin-left: 4rem;
   text-shadow: 0px 4px 4px rgba(0,0,0,0.45);
@@ -43,6 +43,12 @@ const Button = styled.div`
   }
 `
 
+const Text = styled.p`
+  &:hover{
+    text-decoration: underline;
+  }
+`
+
 const navbar = () => {
   return (
     <Wrapper>
@@ -51,14 +57,10 @@ const navbar = () => {
       </Link>
       <ButtonWrapper>
         <Link href="/recipes">
-          <Button>
-            <p className="text">Recipes</p>
-          </Button>
+          <Text className="text">Recipes</Text>
         </Link>
         <Link href="/fridge">
-          <Button>
-            <p className="text">Fridge</p>
-          </Button>
+        <Text className="text">Fridge</Text>
         </Link>
       </ButtonWrapper>
     </Wrapper>

@@ -21,7 +21,7 @@ a {
   }
   body {
     color: white;
-    background: #595959;
+    background: #C2E4EF;
   }
 }
 
@@ -43,6 +43,6 @@ a {
 
 .text {
   font-family: "Avenir Roman";
-  font-size: 24px;
+  font-size: 20px;
   color: black;
 }
