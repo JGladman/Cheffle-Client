@@ -1,25 +1,31 @@
 import React from 'react'
 import styled from 'styled-components'
-import Link from "next/link"
+import Link from 'next/link'
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 6rem;
-  background-color: #F7C244;
-`
+import { Box, Typography } from '@mui/material'
 
-const Title = styled.p`
-  font-size: 60px;
-  color: #FFDE92;
-  margin-left: 4rem;
-  text-shadow: 0px 4px 4px rgba(0,0,0,0.45);
-`
+const Wrapper = styled(Box)(
+  ({ theme }) => `
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 6rem;
+    background-color: ${theme.palette.primary.main};
+  `
+)
 
-const ButtonWrapper = styled.div`
+const Title = styled(Typography)(
+  ({ theme }) => `
+    font-size: 60px;
+    color: ${theme.palette.secondary.main};
+    margin-left: 4rem;
+    text-shadow: 0px 4px 4px rgba(0,0,0,0.45);
+  `
+)
+
+const ButtonWrapper = styled(Box)`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -28,23 +34,8 @@ const ButtonWrapper = styled.div`
   column-gap: 2rem;
 `
 
-const Button = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 9rem;
-  height: 4rem;
-  background-color: #FFE29D;
-  border-radius: 16px;
-  box-shadow: 0px 4px 4px rgba(0,0,0,0.25);
+const Text = styled(Typography)`
   &:hover {
-    box-shadow: 0px 0px 0px black;
-    background-color: #F4B111;
-  }
-`
-
-const Text = styled.p`
-  &:hover{
     text-decoration: underline;
   }
 `
@@ -52,15 +43,15 @@ const Text = styled.p`
 const navbar = () => {
   return (
     <Wrapper>
-      <Link href="/">
-        <Title className="title">Cheffle</Title>
+      <Link href='/'>
+        <Title className='title'>Cheffle</Title>
       </Link>
       <ButtonWrapper>
-        <Link href="/recipes">
-          <Text className="text">Recipes</Text>
+        <Link href='/recipes'>
+          <Text className='text'>Recipes</Text>
         </Link>
-        <Link href="/fridge">
-        <Text className="text">Fridge</Text>
+        <Link href='/fridge'>
+          <Text className='text'>Fridge</Text>
         </Link>
       </ButtonWrapper>
     </Wrapper>
