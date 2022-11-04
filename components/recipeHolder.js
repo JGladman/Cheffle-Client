@@ -5,6 +5,7 @@ import { Box, Button, Switch, Typography, Grid } from '@mui/material'
 
 const recipeHolder = () => {
   const [selected, setSelected] = useState(0)
+  const [recipes, setRecipes] = useState(['Chicken Teriyaki', 'Penne Bolognese', 'Eggs Benedict'])
 
   return (
     <Wrapper>
@@ -17,24 +18,48 @@ const recipeHolder = () => {
         </Tab>
       </Tabs>
       <Holder>
-        <Row>
-          <SwitcherHolder>
-            <p className='text'>Ingredients in Fridge:</p>
-            <StyledSwitch defaultChecked />
-          </SwitcherHolder>
-          <StyledButton>
-            <Typography className='text'>New Recipe</Typography>
-          </StyledButton>
-        </Row>
-        <Row>
-          <RecipeHolder>
-            <Typography className='text'>Chicken Teriyaki (Icons TBD)</Typography>
-          </RecipeHolder>
-          <EditDeleteHolder>
-            <RoundButton></RoundButton>
-            <RoundButton></RoundButton>
-          </EditDeleteHolder>
-        </Row>
+        <Grid container rowSpacing={1}>
+          <Grid md={5} lg={4}>
+            <SwitcherHolder>
+              <p className='text'>Ingredients in Fridge:</p>
+              <StyledSwitch defaultChecked />
+            </SwitcherHolder>
+          </Grid>
+          <Grid md={4} lg={6} />
+          <Grid md={3} lg={2}>
+            <Box display='flex' justifyContent='flex-end'>
+              <StyledButton onClick={() => setRecipes([...recipes, 'Test'])}>
+                <Typography className='text'>New Recipe</Typography>
+              </StyledButton>
+            </Box>
+          </Grid>
+          <Grid md={12}>
+            <Box sx={{ height: '2rem' }} />
+          </Grid>
+          {recipes.map((recipe, i) => (
+            <Grid container key={i}>
+              <Grid md={5} lg={8}>
+                <RecipeHolder>
+                  <Typography className='text'>{recipe}</Typography>
+                </RecipeHolder>
+              </Grid>
+              <Grid md={4} lg={2} />
+              <Grid md={3} lg={2}>
+                <EditDeleteHolder>
+                  <RoundButton>
+                    <Typography>Edit</Typography>
+                  </RoundButton>
+                  <RoundButton>
+                    <Typography>-</Typography>
+                  </RoundButton>
+                </EditDeleteHolder>
+              </Grid>
+              <Grid md={12}>
+                <Box sx={{ height: '2rem' }} />
+              </Grid>
+            </Grid>
+          ))}
+        </Grid>
       </Holder>
     </Wrapper>
   )
@@ -49,9 +74,7 @@ const StyledButton = styled(Button)(
     text-transform: none;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.45);
     height: 4rem;
-    width: 11rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
+    width: 100%;
     background-color: ${theme.palette.secondary.main};
     &:hover {
       background-color: ${theme.palette.secondary.darker};
@@ -70,16 +93,17 @@ const RoundButton = styled(Button)(
   ({ theme }) => `
     display: flex;
     justify-content: center;
+    color: black;
     align-items: center;
     border-radius: 100%;
     width: 4rem;
     height: 4rem;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.45);
     background-color: ${theme.palette.secondary.main};
     &:hover {
       background-color: ${theme.palette.secondary.darker};
     };
     &:active {
-      color: ${theme.palette.secondary.main};
       background-color: ${theme.palette.secondary.main};
     };
     && .MuiTouchRipple-child {
@@ -113,9 +137,10 @@ const Tabs = styled(Box)`
   column-gap: 10px;
 `
 
-const Tab = styled(Box)`
+const Tab = styled(Button)`
   display: flex;
   justify-content: center;
+  text-transform: none;
   align-items: center;
   width: 160px;
   height: 50px;
@@ -129,17 +154,17 @@ const Tab = styled(Box)`
 `
 
 const Holder = styled(Box)`
-  display: flex;
   flex-direction: column;
   justify-content: flex-start;
   background-color: #f7c244;
   width: 100%;
-  height: 100%;
+  height: auto;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.45);
   border-radius: 0px 15px 15px 15px;
   padding-top: 1.5rem;
   padding-left: 3rem;
   padding-right: 3rem;
+  padding-bottom: 2rem;
   gap: 2rem;
 `
 
@@ -150,7 +175,7 @@ const SwitcherHolder = styled(Box)`
   align-items: center;
   background-color: #ffebbd;
   border-radius: 10px;
-  width: 20rem;
+  width: 100%;
   height: 4rem;
   padding-left: 2rem;
 `
@@ -170,7 +195,7 @@ const RecipeHolder = styled(Button)(
     text-transform: none;
     flex-direction: row;
     background-color: ${theme.palette.secondary.main};
-    flex: 2 1 auto;
+    width: 100%;
     height: 4rem;
     border-radius: 10px;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.45);
