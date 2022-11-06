@@ -8,7 +8,8 @@ import { ThemeProvider } from 'styled-components'
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#F7C244'
+      main: '#F7C244',
+      darker: '#D79700'
     },
     secondary: {
       main: '#FFEBBD',

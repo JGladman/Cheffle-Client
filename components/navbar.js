@@ -4,6 +4,24 @@ import Link from 'next/link'
 
 import { Box, Typography } from '@mui/material'
 
+const navbar = () => {
+  return (
+    <Wrapper>
+      <Link href='/'>
+        <Title className='title'>Cheffle</Title>
+      </Link>
+      <ButtonWrapper>
+        <Link href='/recipes'>
+          <Text className='text'>Recipes</Text>
+        </Link>
+        <Link href='/fridge'>
+          <Text className='text'>Fridge</Text>
+        </Link>
+      </ButtonWrapper>
+    </Wrapper>
+  )
+}
+
 const Wrapper = styled(Box)(
   ({ theme }) => `
     display: flex;
@@ -39,23 +57,5 @@ const Text = styled(Typography)`
     text-decoration: underline;
   }
 `
-
-const navbar = () => {
-  return (
-    <Wrapper>
-      <Link href='/'>
-        <Title className='title'>Cheffle</Title>
-      </Link>
-      <ButtonWrapper>
-        <Link href='/recipes'>
-          <Text className='text'>Recipes</Text>
-        </Link>
-        <Link href='/fridge'>
-          <Text className='text'>Fridge</Text>
-        </Link>
-      </ButtonWrapper>
-    </Wrapper>
-  )
-}
 
 export default navbar

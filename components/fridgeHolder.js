@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { Box, Button, Switch, Typography, Grid } from '@mui/material'
 
-import { Tabs, Tab, MainBox, TwoButtonHolder, RoundButton, NormalButton } from '/styles/commonComponents'
+import { Tabs, Tab, MainBox } from '/styles/commonComponents'
 
 const recipeHolder = () => {
   const [selected, setSelected] = useState(0)
@@ -13,7 +13,7 @@ const recipeHolder = () => {
     <Wrapper>
       <Tabs>
         <Tab selected={selected == 0} onClick={() => setSelected(0)}>
-          <Typography className='text'>My Recipes</Typography>
+          <Typography className='text'>My Fridge</Typography>
         </Tab>
         {/* <Tab selected={selected == 1} onClick={() => setSelected(1)}>
           <Typography className='text'>Saved Recipes</Typography>
@@ -30,9 +30,9 @@ const recipeHolder = () => {
           <Grid md={4} lg={6} />
           <Grid md={3} lg={2}>
             <Box display='flex' justifyContent='flex-end'>
-              <NormalButton onClick={() => setRecipes([...recipes, 'Test'])}>
+              <NewRecipe onClick={() => setRecipes([...recipes, 'Test'])}>
                 <Typography className='text'>New Recipe</Typography>
-              </NormalButton>
+              </NewRecipe>
             </Box>
           </Grid>
           <Grid md={12}>
@@ -47,14 +47,14 @@ const recipeHolder = () => {
               </Grid>
               <Grid md={4} lg={2} />
               <Grid md={3} lg={2}>
-                <TwoButtonHolder>
+                <EditDeleteHolder>
                   <RoundButton>
                     <Typography>Edit</Typography>
                   </RoundButton>
                   <RoundButton>
                     <Typography>-</Typography>
                   </RoundButton>
-                </TwoButtonHolder>
+                </EditDeleteHolder>
               </Grid>
               <Grid md={12}>
                 <Box sx={{ height: '2rem' }} />
@@ -66,6 +66,53 @@ const recipeHolder = () => {
     </Wrapper>
   )
 }
+
+const NewRecipe = styled(Button)(
+  ({ theme }) => `
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    text-transform: none;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.45);
+    height: 4rem;
+    width: 100%;
+    background-color: ${theme.palette.secondary.main};
+    &:hover {
+      background-color: ${theme.palette.secondary.darker};
+    };
+    &:active {
+      color: ${theme.palette.secondary.main};
+      background-color: ${theme.palette.secondary.main};
+    };
+    && .MuiTouchRipple-child {
+      background-color: orange;
+    }
+  `
+)
+
+const RoundButton = styled(Button)(
+  ({ theme }) => `
+    display: flex;
+    justify-content: center;
+    color: black;
+    align-items: center;
+    border-radius: 100%;
+    width: 4rem;
+    height: 4rem;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.45);
+    background-color: ${theme.palette.secondary.main};
+    &:hover {
+      background-color: ${theme.palette.secondary.darker};
+    };
+    &:active {
+      background-color: ${theme.palette.secondary.main};
+    };
+    && .MuiTouchRipple-child {
+      background-color: orange;
+    }
+  `
+)
 
 const StyledSwitch = styled(Switch)(({ theme }) => ({
   '& .MuiSwitch-switchBase.Mui-checked': {
@@ -120,5 +167,12 @@ const RecipeHolder = styled(Button)(
     }
   `
 )
+
+const EditDeleteHolder = styled(Box)`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 0 0 11rem;
+`
 
 export default recipeHolder
