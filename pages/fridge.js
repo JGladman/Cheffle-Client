@@ -3,13 +3,13 @@ import React from 'react'
 import { PageWrapper } from '/styles/commonComponents.js'
 
 import Navbar from '../components/navbar'
-import RecipeHolder from '/components/recipeHolder'
+import FridgeHolder from '/components/fridgeHolder'
 
 const Recipes = () => {
   return (
     <PageWrapper>
       <Navbar />
-      <RecipeHolder></RecipeHolder>
+      <FridgeHolder />
     </PageWrapper>
   )
 }

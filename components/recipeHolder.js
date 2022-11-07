@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import { useRouter } from 'next/router'
 
 import { Box, Button, Switch, Typography, Grid } from '@mui/material'
 
@@ -8,6 +9,8 @@ import { Tabs, Tab, MainBox, TwoButtonHolder, RoundButton, NormalButton } from '
 const recipeHolder = () => {
   const [selected, setSelected] = useState(0)
   const [recipes, setRecipes] = useState(['Chicken Teriyaki', 'Penne Bolognese', 'Eggs Benedict'])
+
+  const router = useRouter()
 
   return (
     <Wrapper>
@@ -30,7 +33,7 @@ const recipeHolder = () => {
           <Grid md={4} lg={6} />
           <Grid md={3} lg={2}>
             <Box display='flex' justifyContent='flex-end'>
-              <NormalButton onClick={() => setRecipes([...recipes, 'Test'])}>
+              <NormalButton onClick={() => router.push('/createRecipe')}>
                 <Typography className='text'>New Recipe</Typography>
               </NormalButton>
             </Box>

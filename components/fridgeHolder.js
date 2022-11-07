@@ -1,13 +1,169 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
-import { Box, Button, Switch, Typography, Grid } from '@mui/material'
+import {
+  Box,
+  Button,
+  Switch,
+  Typography,
+  Grid,
+  TextField,
+  ToggleButtonGroup,
+  ToggleButton,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControl
+} from '@mui/material'
 
-import { Tabs, Tab, MainBox } from '/styles/commonComponents'
+import { Tabs, Tab, MainBox, TwoButtonHolder, RoundButton } from '/styles/commonComponents'
+import { NormalButton } from '../styles/commonComponents'
 
-const recipeHolder = () => {
+const fridgeHolder = () => {
   const [selected, setSelected] = useState(0)
-  const [recipes, setRecipes] = useState(['Chicken Teriyaki', 'Penne Bolognese', 'Eggs Benedict'])
+  const [name, setName] = useState('')
+  const [unit, setUnit] = useState('metric')
+  const [ingredientNames, setIngredientNames] = useState(['', ''])
+  const [quantities, setQuantities] = useState([1, 1])
+  const [units, setUnits] = useState(['g', 'g'])
+  const [steps, setSteps] = useState(['', ''])
+  const [changed, setChanged] = useState(false)
+
+  const router = useRouter()
+
+  const handleUnitChange = (event, newUnit) => {
+    if (newUnit !== null) {
+      if (newUnit == 'imperial') {
+        let tmpQty = [...quantities]
+        let tmpUnits = [...units]
+        for (let [i, val] of units.entries()) {
+          switch (val) {
+            case 'mg':
+              tmpQty[i] = tmpQty[i] / 28350
+              tmpUnits[i] = 'oz'
+              break
+            case 'g':
+              tmpQty[i] = tmpQty[i] / 28.35
+              tmpUnits[i] = 'oz'
+              break
+            case 'kg':
+              tmpQty[i] = tmpQty[i] * 35.274
+              tmpUnits[i] = 'oz'
+              break
+            case 'ml':
+              tmpQty[i] = tmpQty[i] / 29.574
+              tmpUnits[i] = 'oz'
+              break
+            case 'l':
+              tmpQty[i] = tmpQty[i] * 33.814
+              tmpUnits[i] = 'oz'
+              break
+          }
+        }
+        setQuantities(tmpQty)
+        setUnits(tmpUnits)
+      } else {
+        let tmpQty = [...quantities]
+        let tmpUnits = [...units]
+        for (let [i, val] of units.entries()) {
+          switch (val) {
+            case 'oz':
+              tmpQty[i] = tmpQty[i] * 28.35
+              tmpUnits[i] = 'g'
+              break
+            case 'pint':
+              tmpQty[i] = tmpQty[i] * 473.2
+              tmpUnits[i] = 'ml'
+              break
+            case 'quart':
+              tmpQty[i] = tmpQty[i] * 1.057
+              tmpUnits[i] = 'l'
+              break
+            case 'gallon':
+              tmpQty[i] = tmpQty[i] * 3.785
+              tmpUnits[i] = 'l'
+              break
+            case 'cup':
+              tmpQty[i] = tmpQty[i] * 236.6
+              tmpUnits[i] = 'ml'
+              break
+          }
+        }
+        setQuantities(tmpQty)
+        setUnits(tmpUnits)
+      }
+      setUnit(newUnit)
+      setChanged(true)
+    }
+  }
+
+  const handleIngredientChange = (i) => (event) => {
+    let tmp = [...ingredientNames]
+    tmp[i] = event.target.value
+    setIngredientNames(tmp)
+    setChanged(true)
+  }
+
+  const handleQuantityChange = (i) => (event) => {
+    if (!isNaN(event.target.value) && !isNaN(parseFloat(event.target.value))) {
+      let tmp = [...quantities]
+      tmp[i] = event.target.value
+      console.log(tmp[i])
+      setQuantities(tmp)
+      setChanged(true)
+    }
+  }
+
+  const handleUnitsChange = (i) => (event) => {
+    let tmp = [...units]
+    tmp[i] = event.target.value
+    setUnits(tmp)
+    setChanged(true)
+  }
+
+  const handleIngredientAdd = (i) => {
+    let namesTmp = [...ingredientNames]
+    let qtyTmp = [...quantities]
+    let unitsTmp = [...units]
+
+    namesTmp.splice(i + 1, 0, '')
+    qtyTmp.splice(i + 1, 0, 1)
+
+    if (unit === 'metric') {
+      unitsTmp.splice(i + 1, 0, 'g')
+    } else {
+      unitsTmp.splice(i + 1, 0, 'oz')
+    }
+
+    setIngredientNames(namesTmp)
+    setQuantities(qtyTmp)
+    setUnits(unitsTmp)
+    setChanged(true)
+  }
+
+  const handleStepChange = (i) => (event) => {
+    let tmp = [...steps]
+    tmp[i] = event.target.value
+    setSteps(tmp)
+  }
+
+  const handleStepRemove = (i) => {
+    let stepsTmp = [...steps]
+
+    stepsTmp.splice(i, 1)
+
+    setSteps(stepsTmp)
+  }
+
+  const handleStepAdd = (i) => {
+    let stepsTmp = [...steps]
+
+    stepsTmp.splice(i + 1, 0, '')
+
+    setSteps(stepsTmp)
+  }
 
   return (
     <Wrapper>
@@ -15,113 +171,143 @@ const recipeHolder = () => {
         <Tab selected={selected == 0} onClick={() => setSelected(0)}>
           <Typography className='text'>My Fridge</Typography>
         </Tab>
-        {/* <Tab selected={selected == 1} onClick={() => setSelected(1)}>
-          <Typography className='text'>Saved Recipes</Typography>
-        </Tab> */}
       </Tabs>
       <MainBox>
         <Grid container rowSpacing={1}>
-          <Grid md={5} lg={4}>
-            <SwitcherHolder>
-              <p className='text'>Ingredients in Fridge:</p>
-              <StyledSwitch defaultChecked />
-            </SwitcherHolder>
+          <Grid lg={2}>
+            <ToggleButtonGroup value={unit} exclusive onChange={handleUnitChange}>
+              <UnitButton value='metric'>
+                <Typography>Metric</Typography>
+              </UnitButton>
+              <UnitButton value='imperial'>
+                <Typography>Imperial</Typography>
+              </UnitButton>
+            </ToggleButtonGroup>
           </Grid>
-          <Grid md={4} lg={6} />
-          <Grid md={3} lg={2}>
-            <Box display='flex' justifyContent='flex-end'>
-              <NewRecipe onClick={() => setRecipes([...recipes, 'Test'])}>
-                <Typography className='text'>New Recipe</Typography>
-              </NewRecipe>
-            </Box>
-          </Grid>
-          <Grid md={12}>
+          <Grid lg={12}>
             <Box sx={{ height: '2rem' }} />
           </Grid>
-          {recipes.map((recipe, i) => (
-            <Grid container key={i}>
-              <Grid md={5} lg={8}>
-                <RecipeHolder>
-                  <Typography className='text'>{recipe}</Typography>
-                </RecipeHolder>
+          <Grid lg={12}>
+            <Typography sx={{ color: 'black', marginBottom: '1rem' }}>Items:</Typography>
+          </Grid>
+          {ingredientNames.map((ingredient, i) => (
+            <Grid container key={i} sx={{ marginBottom: '1rem' }}>
+              <Grid lg={5}>
+                <InputField
+                  label='Item'
+                  variant='filled'
+                  fullWidth
+                  value={ingredientNames[i]}
+                  onChange={handleIngredientChange(i)}
+                  sx={{ width: '90%' }}
+                >
+                  {ingredient}
+                </InputField>
+              </Grid>
+              <Grid lg={1.5}>
+                <InputField
+                  label='Qty'
+                  variant='filled'
+                  sx={{ width: '95%' }}
+                  type='number'
+                  value={quantities[i]}
+                  onChange={handleQuantityChange(i)}
+                >
+                  {ingredient}
+                </InputField>
+              </Grid>
+              <Grid lg={1.5}>
+                <Box sx={{ width: '100%' }}>
+                  {unit === 'metric' ? (
+                    <DropDown value={units[i]} onChange={handleUnitsChange(i)} sx={{ width: '100%' }}>
+                      <MenuItem value='mg'>mg</MenuItem>
+                      <MenuItem value='g'>g</MenuItem>
+                      <MenuItem value='kg'>kg</MenuItem>
+                      <MenuItem value='ml'>ml</MenuItem>
+                      <MenuItem value='l'>l</MenuItem>
+                    </DropDown>
+                  ) : (
+                    <DropDown value={units[i]} onChange={handleUnitsChange(i)} sx={{ width: '100%' }}>
+                      <MenuItem value='oz'>oz</MenuItem>
+                      <MenuItem value='pint'>Pint</MenuItem>
+                      <MenuItem value='quart'>Quart</MenuItem>
+                      <MenuItem value='gallon'>Gallon</MenuItem>
+                      <MenuItem value='cup'>Cup</MenuItem>
+                    </DropDown>
+                  )}
+                </Box>
               </Grid>
               <Grid md={4} lg={2} />
               <Grid md={3} lg={2}>
-                <EditDeleteHolder>
-                  <RoundButton>
-                    <Typography>Edit</Typography>
+                <TwoButtonHolder>
+                  <RoundButton onClick={() => handleIngredientAdd(i)}>
+                    <Typography>+</Typography>
                   </RoundButton>
-                  <RoundButton>
+                  <RoundButton onClick={() => handleIngredientRemove(i)}>
                     <Typography>-</Typography>
                   </RoundButton>
-                </EditDeleteHolder>
-              </Grid>
-              <Grid md={12}>
-                <Box sx={{ height: '2rem' }} />
+                </TwoButtonHolder>
               </Grid>
             </Grid>
           ))}
+          <Grid lg={12}>
+            <Box sx={{ height: '2rem' }} />
+          </Grid>
+          {changed && (
+            <Grid container>
+              <Grid lg={10} />
+              <Grid lg={2}>
+                <ButtonWrapper>
+                  <NormalButton onClick={() => router.push('/recipes')}>
+                    <Typography className='text'>Save</Typography>
+                  </NormalButton>
+                </ButtonWrapper>
+              </Grid>
+            </Grid>
+          )}
         </Grid>
       </MainBox>
     </Wrapper>
   )
 }
 
-const NewRecipe = styled(Button)(
-  ({ theme }) => `
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    text-transform: none;
-    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.45);
-    height: 4rem;
-    width: 100%;
-    background-color: ${theme.palette.secondary.main};
-    &:hover {
-      background-color: ${theme.palette.secondary.darker};
-    };
-    &:active {
-      color: ${theme.palette.secondary.main};
-      background-color: ${theme.palette.secondary.main};
-    };
-    && .MuiTouchRipple-child {
-      background-color: orange;
-    }
-  `
-)
+const ButtonWrapper = styled(Box)`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 2rem;
+`
 
-const RoundButton = styled(Button)(
-  ({ theme }) => `
-    display: flex;
-    justify-content: center;
-    color: black;
-    align-items: center;
-    border-radius: 100%;
-    width: 4rem;
-    height: 4rem;
-    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.45);
-    background-color: ${theme.palette.secondary.main};
-    &:hover {
-      background-color: ${theme.palette.secondary.darker};
-    };
-    &:active {
-      background-color: ${theme.palette.secondary.main};
-    };
-    && .MuiTouchRipple-child {
-      background-color: orange;
-    }
-  `
-)
+const InputField = styled(TextField)(({ theme }) => ({
+  boxShadow: '4px 4px 4px rgba(0, 0, 0, 0.45)',
+  '& label.Mui-focused': {
+    color: theme.palette.primary.darker
+  },
+  '& .MuiFilledInput-underline:after': {
+    borderBottomColor: theme.palette.primary.darker
+  },
+  '& .MuiFilledInput-root': {
+    backgroundColor: theme.palette.secondary.main
+  }
+}))
 
-const StyledSwitch = styled(Switch)(({ theme }) => ({
-  '& .MuiSwitch-switchBase.Mui-checked': {
-    color: theme.palette.primary.main
-  },
-  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-    backgroundColor: theme.palette.primary.main
-  },
-  marginRight: '1rem'
+const DropDown = styled(Select)(({ theme }) => ({
+  boxShadow: '4px 4px 4px rgba(0, 0, 0, 0.45)',
+  backgroundColor: theme.palette.secondary.main
+}))
+
+const UnitButton = styled(ToggleButton)(({ theme }) => ({
+  backgroundColor: theme.palette.secondary.main,
+  color: 'black',
+  textTransform: 'none',
+  width: '50%',
+  height: '3.25rem',
+  boxShadow: '4px 4px 4px rgba(0, 0, 0, 0.45)',
+  '&.Mui-selected': {
+    backgroundColor: theme.palette.primary.darker,
+    color: 'white'
+  }
 }))
 
 const Wrapper = styled(Box)`
@@ -132,47 +318,4 @@ const Wrapper = styled(Box)`
   height: auto;
 `
 
-const SwitcherHolder = styled(Box)`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #ffebbd;
-  border-radius: 10px;
-  width: 100%;
-  height: 4rem;
-  padding-left: 2rem;
-`
-
-const RecipeHolder = styled(Button)(
-  ({ theme }) => `
-    display: flex;
-    text-transform: none;
-    flex-direction: row;
-    background-color: ${theme.palette.secondary.main};
-    width: 100%;
-    height: 4rem;
-    border-radius: 10px;
-    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.45);
-    justify-content: space-between;
-    &:hover {
-      background-color: ${theme.palette.secondary.darker};
-    };
-    &:active {
-      color: ${theme.palette.secondary.main};
-      background-color: ${theme.palette.secondary.main};
-    };
-    && .MuiTouchRipple-child {
-      background-color: orange;
-    }
-  `
-)
-
-const EditDeleteHolder = styled(Box)`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  flex: 0 0 11rem;
-`
-
-export default recipeHolder
+export default fridgeHolder
