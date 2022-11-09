@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { useRouter } from 'next/router'
+import axios from 'axios'
 
 import { Box, Button, Switch, Typography, Grid } from '@mui/material'
 
@@ -8,9 +9,28 @@ import { Tabs, Tab, MainBox, TwoButtonHolder, RoundButton, NormalButton } from '
 
 const recipeHolder = () => {
   const [selected, setSelected] = useState(0)
-  const [recipes, setRecipes] = useState(['Chicken Teriyaki', 'Penne Bolognese', 'Eggs Benedict'])
+  const [recipes, setRecipes] = useState([])
+  const [ready, setReady] = useState(false)
 
   const router = useRouter()
+
+  useEffect(() => {
+    axios.get(`http://127.0.0.1:8000/recipes/`).then((res) => {
+      const loaded = []
+      res.data.recipes.map((ingredient) => {
+        loaded.push(ingredient)
+      })
+      setRecipes(loaded)
+    })
+  }, [])
+
+  const deleteRecipe = (id) => {
+    axios.delete(`http://127.0.0.1:8000/recipes/delete/${id}/`)
+    const tmp = [...recipes]
+    const index = tmp.findIndex((item) => item.id == id)
+    tmp.splice(index, 1)
+    setRecipes(tmp)
+  }
 
   return (
     <Wrapper>
@@ -27,7 +47,7 @@ const recipeHolder = () => {
           <Grid md={5} lg={4}>
             <SwitcherHolder>
               <p className='text'>Ingredients in Fridge:</p>
-              <StyledSwitch defaultChecked />
+              <StyledSwitch onChange={(event) => setReady(!ready)} />
             </SwitcherHolder>
           </Grid>
           <Grid md={4} lg={6} />
@@ -41,29 +61,55 @@ const recipeHolder = () => {
           <Grid md={12}>
             <Box sx={{ height: '2rem' }} />
           </Grid>
-          {recipes.map((recipe, i) => (
-            <Grid container key={i}>
-              <Grid md={5} lg={8}>
-                <RecipeHolder>
-                  <Typography className='text'>{recipe}</Typography>
-                </RecipeHolder>
-              </Grid>
-              <Grid md={4} lg={2} />
-              <Grid md={3} lg={2}>
-                <TwoButtonHolder>
-                  <RoundButton>
-                    <Typography>Edit</Typography>
-                  </RoundButton>
-                  <RoundButton>
-                    <Typography>-</Typography>
-                  </RoundButton>
-                </TwoButtonHolder>
-              </Grid>
-              <Grid md={12}>
-                <Box sx={{ height: '2rem' }} />
-              </Grid>
-            </Grid>
-          ))}
+          {ready
+            ? recipes
+                .filter((recipe) => recipe.ready)
+                .map((recipe) => (
+                  <Grid container key={recipe.id}>
+                    <Grid md={5} lg={8}>
+                      <RecipeHolder>
+                        <Typography className='text'>{recipe.recipeName}</Typography>
+                      </RecipeHolder>
+                    </Grid>
+                    <Grid md={4} lg={2} />
+                    <Grid md={3} lg={2}>
+                      <TwoButtonHolder>
+                        <RoundButton>
+                          <Typography>Edit</Typography>
+                        </RoundButton>
+                        <RoundButton onClick={() => deleteRecipe(recipe.id)}>
+                          <Typography>-</Typography>
+                        </RoundButton>
+                      </TwoButtonHolder>
+                    </Grid>
+                    <Grid md={12}>
+                      <Box sx={{ height: '2rem' }} />
+                    </Grid>
+                  </Grid>
+                ))
+            : recipes.map((recipe) => (
+                <Grid container key={recipe.id}>
+                  <Grid md={5} lg={8}>
+                    <RecipeHolder>
+                      <Typography className='text'>{recipe.recipeName}</Typography>
+                    </RecipeHolder>
+                  </Grid>
+                  <Grid md={4} lg={2} />
+                  <Grid md={3} lg={2}>
+                    <TwoButtonHolder>
+                      <RoundButton>
+                        <Typography>Edit</Typography>
+                      </RoundButton>
+                      <RoundButton onClick={() => deleteRecipe(recipe.id)}>
+                        <Typography>-</Typography>
+                      </RoundButton>
+                    </TwoButtonHolder>
+                  </Grid>
+                  <Grid md={12}>
+                    <Box sx={{ height: '2rem' }} />
+                  </Grid>
+                </Grid>
+              ))}
         </Grid>
       </MainBox>
     </Wrapper>

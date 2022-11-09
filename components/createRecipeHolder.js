@@ -94,16 +94,10 @@ const recipeHolder = () => {
     }
   }
 
-  const handleUnitsChange = (i) => (event) => {
-    let tmp = [...units]
-    tmp[i] = event.target.value
-    setUnits(tmp)
-  }
-
   const handleIngredientAdd = (i) => {
     let tmp = [...ingredients]
     tmp.splice(i + 1, 0, {
-      name: '',
+      ingredientName: '',
       quantity: 1,
       unit: unit === 'metric' ? 'g' : 'oz'
     })
@@ -190,11 +184,11 @@ const recipeHolder = () => {
                   label='Ingredient'
                   variant='filled'
                   fullWidth
-                  value={ingredient['name']}
+                  value={ingredient.ingredientName}
                   onChange={handleIngredientChange(i, 'name')}
                   sx={{ width: '90%' }}
                 >
-                  {ingredient['name']}
+                  {ingredient.ingredientName}
                 </InputField>
               </Grid>
               <Grid lg={1.5}>
