@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import axios from 'axios'
 
 import {
   Box,
@@ -23,152 +24,185 @@ import { NormalButton } from '../styles/commonComponents'
 
 const fridgeHolder = () => {
   const [selected, setSelected] = useState(0)
-  const [name, setName] = useState('')
   const [unit, setUnit] = useState('metric')
-  const [ingredientNames, setIngredientNames] = useState(['', ''])
-  const [quantities, setQuantities] = useState([1, 1])
-  const [units, setUnits] = useState(['g', 'g'])
-  const [steps, setSteps] = useState(['', ''])
-  const [changed, setChanged] = useState(false)
+  const [ingredients, setIngredients] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [changed, setChanged] = useState([])
+  const [deleted, setDeleted] = useState([])
 
   const router = useRouter()
 
+  useEffect(() => {
+    axios.get(`http://127.0.0.1:8000/ingredients/`).then((res) => {
+      const loaded = []
+      res.data.ingredients.map((ingredient) => {
+        loaded.push(ingredient)
+      })
+      setIngredients(loaded)
+      setLoading(false)
+    })
+  }, [])
+
   const handleUnitChange = (event, newUnit) => {
     if (newUnit !== null) {
+      let ingredientsTmp = [...ingredients]
+      let changedTmp = [...changed]
       if (newUnit == 'imperial') {
-        let tmpQty = [...quantities]
-        let tmpUnits = [...units]
-        for (let [i, val] of units.entries()) {
-          switch (val) {
+        ingredientsTmp.map((ingredient) => {
+          switch (ingredient['unit']) {
             case 'mg':
-              tmpQty[i] = tmpQty[i] / 28350
-              tmpUnits[i] = 'oz'
+              ingredient['quantity'] = ingredient['quantity'] / 28350
+              ingredient['unit'] = 'oz'
               break
             case 'g':
-              tmpQty[i] = tmpQty[i] / 28.35
-              tmpUnits[i] = 'oz'
+              ingredient['quantity'] = ingredient['quantity'] / 28.35
+              ingredient['unit'] = 'oz'
               break
             case 'kg':
-              tmpQty[i] = tmpQty[i] * 35.274
-              tmpUnits[i] = 'oz'
+              ingredient['quantity'] = ingredient['quantity'] * 35.274
+              ingredient['unit'] = 'oz'
               break
             case 'ml':
-              tmpQty[i] = tmpQty[i] / 29.574
-              tmpUnits[i] = 'oz'
+              ingredient['quantity'] = ingredient['quantity'] / 29.574
+              ingredient['unit'] = 'oz'
               break
             case 'l':
-              tmpQty[i] = tmpQty[i] * 33.814
-              tmpUnits[i] = 'oz'
+              ingredient['quantity'] = ingredient['quantity'] * 33.814
+              ingredient['unit'] = 'oz'
               break
           }
-        }
-        setQuantities(tmpQty)
-        setUnits(tmpUnits)
+          ingredient['quantity'] = Math.ceil(ingredient['quantity'] * 100) / 100
+          if (changedTmp.filter((item) => item.id == ingredient['id']).length == 0) changedTmp.push(ingredient)
+          else {
+            const tmpIndex = changedTmp.findIndex((item) => item.id == ingredient['id'])
+            changedTmp.splice(tmpIndex, 1, ingredient)
+          }
+          setChanged(changedTmp)
+        })
       } else {
-        let tmpQty = [...quantities]
-        let tmpUnits = [...units]
-        for (let [i, val] of units.entries()) {
-          switch (val) {
+        ingredientsTmp.map((ingredient) => {
+          switch (ingredient['unit']) {
             case 'oz':
-              tmpQty[i] = tmpQty[i] * 28.35
-              tmpUnits[i] = 'g'
+              ingredient['quantity'] = ingredient['quantity'] * 28.35
+              ingredient['unit'] = 'g'
               break
             case 'pint':
-              tmpQty[i] = tmpQty[i] * 473.2
-              tmpUnits[i] = 'ml'
+              ingredient['quantity'] = ingredient['quantity'] * 473.2
+              ingredient['unit'] = 'ml'
               break
             case 'quart':
-              tmpQty[i] = tmpQty[i] * 1.057
-              tmpUnits[i] = 'l'
+              ingredient['quantity'] = ingredient['quantity'] * 1.057
+              ingredient['unit'] = 'l'
               break
             case 'gallon':
-              tmpQty[i] = tmpQty[i] * 3.785
-              tmpUnits[i] = 'l'
+              ingredient['quantity'] = ingredient['quantity'] * 3.785
+              ingredient['unit'] = 'l'
               break
             case 'cup':
-              tmpQty[i] = tmpQty[i] * 236.6
-              tmpUnits[i] = 'ml'
+              ingredient['quantity'] = ingredient['quantity'] * 236.6
+              ingredient['unit'] = 'ml'
               break
           }
-        }
-        setQuantities(tmpQty)
-        setUnits(tmpUnits)
+          ingredient['quantity'] = Math.ceil(ingredient['quantity'] * 100) / 100
+          if (changedTmp.filter((item) => item.id == ingredient['id']).length == 0) changedTmp.push(ingredient)
+          else {
+            const tmpIndex = changedTmp.findIndex((item) => item.id == ingredient['id'])
+            changedTmp.splice(tmpIndex, 1, ingredient)
+          }
+          setChanged(changedTmp)
+        })
       }
+      setIngredients(ingredientsTmp)
       setUnit(newUnit)
-      setChanged(true)
     }
   }
 
-  const handleIngredientChange = (i) => (event) => {
-    let tmp = [...ingredientNames]
-    tmp[i] = event.target.value
-    setIngredientNames(tmp)
-    setChanged(true)
-  }
+  const handleIngredientChange = (id, field) => (event) => {
+    let changedTmp = [...changed]
+    let index = ingredients.findIndex((item) => item['id'] == id)
+    let ingredientTmp = [...ingredients]
+    const ingredient = ingredients[index]
+    ingredient[field] = event.target.value
+    ingredientTmp.splice(index, 1, ingredient)
+    setIngredients(ingredientTmp)
 
-  const handleQuantityChange = (i) => (event) => {
-    if (!isNaN(event.target.value) && !isNaN(parseFloat(event.target.value))) {
-      let tmp = [...quantities]
-      tmp[i] = event.target.value
-      console.log(tmp[i])
-      setQuantities(tmp)
-      setChanged(true)
+    if (changedTmp.filter((item) => item.id == id).length == 0) changedTmp.push(ingredient)
+    else {
+      const tmpIndex = changedTmp.findIndex((item) => item.id == id)
+      changedTmp.splice(tmpIndex, 1, ingredient)
     }
+    setChanged(changedTmp)
+    console.log('Changed: ', changed)
   }
 
-  const handleUnitsChange = (i) => (event) => {
-    let tmp = [...units]
-    tmp[i] = event.target.value
-    setUnits(tmp)
-    setChanged(true)
+  const handleQuantityChange = (id, field) => (event) => {
+    if (!isNaN(event.target.value) && !isNaN(parseFloat(event.target.value)) && event.target.value > 0) {
+      let tmp = [...changed]
+      let index = ingredients.findIndex((item) => item['id'] == id)
+      let ingredientTmp = [...ingredients]
+      const ingredient = ingredients[index]
+      ingredient[field] = event.target.value
+      ingredientTmp.splice(index, 1, ingredient)
+      setIngredients(ingredientTmp)
+
+      if (tmp.filter((item) => item.id == id).length > 0) tmp.push(ingredient)
+      else {
+        const tmpIndex = tmp.findIndex((item) => item.id == id)
+        tmp.splice(tmpIndex, 1, ingredient)
+      }
+      setChanged(tmp)
+    }
   }
 
   const handleIngredientAdd = (i) => {
-    let namesTmp = [...ingredientNames]
-    let qtyTmp = [...quantities]
-    let unitsTmp = [...units]
+    const ingredientsTmp = [...ingredients]
+    const changedTmp = [...changed]
 
-    namesTmp.splice(i + 1, 0, '')
-    qtyTmp.splice(i + 1, 0, 1)
-
-    if (unit === 'metric') {
-      unitsTmp.splice(i + 1, 0, 'g')
-    } else {
-      unitsTmp.splice(i + 1, 0, 'oz')
+    const id = Math.floor(Math.random() * 100000)
+    const ingredient = {
+      id: id,
+      ingredientName: '',
+      quantity: 1,
+      unit: unit === 'metric' ? 'g' : 'oz',
+      new: true
     }
-
-    setIngredientNames(namesTmp)
-    setQuantities(qtyTmp)
-    setUnits(unitsTmp)
-    setChanged(true)
+    ingredientsTmp.splice(i + 1, 0, ingredient)
+    if (changedTmp.filter((item) => item.id == id).length == 0) changedTmp.push(ingredient)
+    else {
+      const tmpIndex = changedTmp.findIndex((item) => item.id == id)
+      changedTmp.splice(tmpIndex, 1, ingredient)
+    }
+    setIngredients(ingredientsTmp)
+    setChanged(changedTmp)
   }
 
-  const handleStepChange = (i) => (event) => {
-    let tmp = [...steps]
-    tmp[i] = event.target.value
-    setSteps(tmp)
+  const handleIngredientRemove = (id) => {
+    const ingredientsTmp = [...ingredients]
+    const ingredientsIndex = ingredientsTmp.findIndex((item) => item.id == id)
+    ingredientsTmp.splice(ingredientsIndex, 1)
+    setIngredients(ingredientsTmp)
+
+    const deletedTmp = [...deleted]
+    deletedTmp.push(id)
+    setDeleted(deletedTmp)
   }
 
-  const handleStepRemove = (i) => {
-    let stepsTmp = [...steps]
-
-    stepsTmp.splice(i, 1)
-
-    setSteps(stepsTmp)
-  }
-
-  const handleStepAdd = (i) => {
-    let stepsTmp = [...steps]
-
-    stepsTmp.splice(i + 1, 0, '')
-
-    setSteps(stepsTmp)
+  const save = () => {
+    const added = []
+    changed.map((change) => {
+      if ('new' in change) {
+        added.push(change)
+      }
+    })
+    setChanged([])
+    setDeleted([])
+    axios.post(`http://127.0.0.1:8000/ingredients/create/`, { new: added })
   }
 
   return (
     <Wrapper>
       <Tabs>
-        <Tab selected={selected == 0} onClick={() => setSelected(0)}>
+        <Tab selected={selected == 0} onClick={() => console.log(ingredients)}>
           <Typography className='text'>My Fridge</Typography>
         </Tab>
       </Tabs>
@@ -190,15 +224,15 @@ const fridgeHolder = () => {
           <Grid lg={12}>
             <Typography sx={{ color: 'black', marginBottom: '1rem' }}>Items:</Typography>
           </Grid>
-          {ingredientNames.map((ingredient, i) => (
-            <Grid container key={i} sx={{ marginBottom: '1rem' }}>
+          {ingredients.map((ingredient, i) => (
+            <Grid container key={ingredient['id']} sx={{ marginBottom: '1rem' }}>
               <Grid lg={5}>
                 <InputField
                   label='Item'
                   variant='filled'
                   fullWidth
-                  value={ingredientNames[i]}
-                  onChange={handleIngredientChange(i)}
+                  value={ingredient['ingredientName']}
+                  onChange={handleIngredientChange(ingredient['id'], 'ingredientName')}
                   sx={{ width: '90%' }}
                 >
                   {ingredient}
@@ -210,8 +244,8 @@ const fridgeHolder = () => {
                   variant='filled'
                   sx={{ width: '95%' }}
                   type='number'
-                  value={quantities[i]}
-                  onChange={handleQuantityChange(i)}
+                  value={ingredient['quantity']}
+                  onChange={handleQuantityChange(ingredient['id'], 'quantity')}
                 >
                   {ingredient}
                 </InputField>
@@ -219,7 +253,11 @@ const fridgeHolder = () => {
               <Grid lg={1.5}>
                 <Box sx={{ width: '100%' }}>
                   {unit === 'metric' ? (
-                    <DropDown value={units[i]} onChange={handleUnitsChange(i)} sx={{ width: '100%' }}>
+                    <DropDown
+                      value={ingredient['unit']}
+                      onChange={handleIngredientChange(ingredient['id'], 'unit')}
+                      sx={{ width: '100%' }}
+                    >
                       <MenuItem value='mg'>mg</MenuItem>
                       <MenuItem value='g'>g</MenuItem>
                       <MenuItem value='kg'>kg</MenuItem>
@@ -227,7 +265,7 @@ const fridgeHolder = () => {
                       <MenuItem value='l'>l</MenuItem>
                     </DropDown>
                   ) : (
-                    <DropDown value={units[i]} onChange={handleUnitsChange(i)} sx={{ width: '100%' }}>
+                    <DropDown value={ingredient['unit']} onChange={handleIngredientChange(ingredient['id'], 'unit')}>
                       <MenuItem value='oz'>oz</MenuItem>
                       <MenuItem value='pint'>Pint</MenuItem>
                       <MenuItem value='quart'>Quart</MenuItem>
@@ -243,7 +281,7 @@ const fridgeHolder = () => {
                   <RoundButton onClick={() => handleIngredientAdd(i)}>
                     <Typography>+</Typography>
                   </RoundButton>
-                  <RoundButton onClick={() => handleIngredientRemove(i)}>
+                  <RoundButton onClick={() => handleIngredientRemove(ingredient['id'])}>
                     <Typography>-</Typography>
                   </RoundButton>
                 </TwoButtonHolder>
@@ -253,12 +291,12 @@ const fridgeHolder = () => {
           <Grid lg={12}>
             <Box sx={{ height: '2rem' }} />
           </Grid>
-          {changed && (
+          {changed.length > 0 && (
             <Grid container>
               <Grid lg={10} />
               <Grid lg={2}>
                 <ButtonWrapper>
-                  <NormalButton onClick={() => router.push('/recipes')}>
+                  <NormalButton onClick={() => save()}>
                     <Typography className='text'>Save</Typography>
                   </NormalButton>
                 </ButtonWrapper>
