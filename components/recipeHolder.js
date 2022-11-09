@@ -67,7 +67,7 @@ const recipeHolder = () => {
                 .map((recipe) => (
                   <Grid container key={recipe.id}>
                     <Grid md={5} lg={8}>
-                      <RecipeHolder>
+                      <RecipeHolder onClick={() => router.push(`/recipe/${recipe.id}`)}>
                         <Typography className='text'>{recipe.recipeName}</Typography>
                       </RecipeHolder>
                     </Grid>
@@ -90,7 +90,7 @@ const recipeHolder = () => {
             : recipes.map((recipe) => (
                 <Grid container key={recipe.id}>
                   <Grid md={5} lg={8}>
-                    <RecipeHolder>
+                    <RecipeHolder onClick={() => router.push(`/recipe/${recipe.id}`)}>
                       <Typography className='text'>{recipe.recipeName}</Typography>
                     </RecipeHolder>
                   </Grid>
