@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -24,9 +24,10 @@ import { NormalButton } from '../styles/commonComponents'
 
 const fridgeHolder = () => {
   const [selected, setSelected] = useState(0)
-  const [unit, setUnit] = useState('metric')
+  const [unit, setUnit] = useState('')
   const [ingredients, setIngredients] = useState([])
   const [loading, setLoading] = useState(true)
+  const isMounted = useRef(false)
   const [changed, setChanged] = useState([])
   const [deleted, setDeleted] = useState([])
 
@@ -39,6 +40,7 @@ const fridgeHolder = () => {
         loaded.push(ingredient)
       })
       setIngredients(loaded)
+      setUnit(res.data.unit)
       setLoading(false)
     })
   }, [])
@@ -189,14 +191,21 @@ const fridgeHolder = () => {
 
   const save = () => {
     const added = []
+    const updated = []
+    const removed = []
     changed.map((change) => {
       if ('new' in change) {
         added.push(change)
+      } else {
+        updated.push(change)
       }
     })
+    deleted.map((id) => removed.push(id))
     setChanged([])
     setDeleted([])
-    axios.post(`http://127.0.0.1:8000/ingredients/create/`, { new: added })
+    if (added.length > 0) axios.post(`http://127.0.0.1:8000/ingredients/create/`, { new: added })
+    if (updated.length > 0) axios.put(`http://127.0.0.1:8000/ingredients/update/`, { changes: updated })
+    if (removed.length > 0) axios.delete(`http://127.0.0.1:8000/ingredients/delete/`, { data: { ids: removed } })
   }
 
   return (
