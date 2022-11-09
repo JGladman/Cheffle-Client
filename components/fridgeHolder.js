@@ -300,7 +300,7 @@ const fridgeHolder = () => {
           <Grid lg={12}>
             <Box sx={{ height: '2rem' }} />
           </Grid>
-          {changed.length > 0 && (
+          {changed.length + deleted.length > 0 && (
             <Grid container>
               <Grid lg={10} />
               <Grid lg={2}>
