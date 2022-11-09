@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 
-import { Box, Typography, Grid, TextField, ToggleButtonGroup, ToggleButton, Select, MenuItem } from '@mui/material'
+import { Box, Typography, Grid } from '@mui/material'
 
-import { Tabs, Tab, MainBox, TwoButtonHolder, RoundButton, NormalButton } from '/styles/commonComponents'
+import { Tabs, Tab, MainBox, NormalButton } from '/styles/commonComponents'
 
 const viewRecipeHolder = ({ id }) => {
   const [selected, setSelected] = useState(0)
@@ -119,7 +119,7 @@ const viewRecipeHolder = ({ id }) => {
           <Grid lg={10} />
           <Grid lg={2}>
             <ButtonWrapper>
-              <NormalButton onClick={() => handleSave()}>
+              <NormalButton onClick={() => router.push(`/recipe/update/${id}`)}>
                 <Typography className='text'>Edit</Typography>
               </NormalButton>
             </ButtonWrapper>

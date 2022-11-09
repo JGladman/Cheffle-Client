@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -9,14 +9,24 @@ import { Box, Typography, Grid, TextField, ToggleButtonGroup, ToggleButton, Sele
 import { Tabs, Tab, MainBox, TwoButtonHolder, RoundButton } from '/styles/commonComponents'
 import { NormalButton } from '../styles/commonComponents'
 
-const recipeHolder = () => {
+const UpdateRecipeHolder = ({ id }) => {
   const [selected, setSelected] = useState(0)
   const [name, setName] = useState('')
   const [unit, setUnit] = useState('metric')
-  const [steps, setSteps] = useState([{ stepNumber: 0, step: '' }])
-  const [ingredients, setIngredients] = useState([{ ingredientName: 'New Ingredient', unit: 'g', quantity: 1 }])
+  const [steps, setSteps] = useState([])
+  const [ingredients, setIngredients] = useState([])
 
   const router = useRouter()
+
+  useEffect(() => {
+    axios.get(`http://127.0.0.1:8000/recipes/${id}/`).then((res) => {
+      const stepsTmp = []
+      res.data.steps.map((step, i) => stepsTmp.push({ step: step, stepNumber: i }))
+      setName(res.data.recipe)
+      setIngredients(res.data.ingredients)
+      setSteps(stepsTmp)
+    })
+  }, [])
 
   const handleUnitChange = (event, newUnit) => {
     if (newUnit !== null) {
@@ -134,7 +144,7 @@ const recipeHolder = () => {
 
   const handleSave = () => {
     axios
-      .post(`http://127.0.0.1:8000/recipes/create/`, {
+      .put(`http://127.0.0.1:8000/recipes/update/${id}/`, {
         recipeName: name,
         ingredients: ingredients,
         steps: steps
@@ -146,7 +156,7 @@ const recipeHolder = () => {
     <Wrapper>
       <Tabs>
         <Tab selected={selected == 0} onClick={() => setSelected(0)}>
-          <Typography className='text'>New Recipe</Typography>
+          <Typography className='text'>Update Recipe</Typography>
         </Tab>
       </Tabs>
       <MainBox>
@@ -259,11 +269,11 @@ const recipeHolder = () => {
                   variant='filled'
                   fullWidth
                   multiline
-                  value={steps[i]['step']}
+                  value={step.step}
                   onChange={handleStepChange(i)}
                   sx={{ width: '100%' }}
                 >
-                  {step}
+                  {step.step}
                 </InputField>
               </Grid>
               <Grid md={4} lg={2} />
@@ -343,4 +353,4 @@ const Wrapper = styled(Box)`
   height: auto;
 `
 
-export default recipeHolder
+export default UpdateRecipeHolder
